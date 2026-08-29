@@ -42,7 +42,7 @@ function MainContent({
 
     try {
         const res = await fetch(
-            "http://localhost:8080/health"
+            "https://golang-apis-dox2.onrender.com/health"
         );
 
         if (res.ok) {
