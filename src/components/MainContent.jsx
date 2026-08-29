@@ -30,59 +30,57 @@ function MainContent({
     ]);
 
     const [visibleApis, setVisibleApis] = useState(3);
+
     const totalRequests = requestHistory.length;
 
+    // Check backend health
     useEffect(() => {
         if (activePage !== "overview") {
             return;
         }
 
         const checkServer = async () => {
-    setApiStatus("checking");
+            setApiStatus("checking");
 
-    try {
-        const res = await fetch(
-            "https://golang-apis-dox2.onrender.com/health"
-        );
+            try {
+                const res = await fetch(
+                    "https://golang-apis-dox2.onrender.com/health"
+                );
 
-        if (res.ok) {
-            setApiStatus("online");
-        } else {
-            setApiStatus("offline");
-        }
-    } catch (error) {
-        console.error("API status check failed:", error);
-        setApiStatus("offline");
-    }
-};
+                if (res.ok) {
+                    setApiStatus("online");
+                } else {
+                    setApiStatus("offline");
+                }
+            } catch (error) {
+                console.error("API status check failed:", error);
+                setApiStatus("offline");
+            }
+        };
 
         checkServer();
     }, [activePage]);
 
-    const successfulRequests = requestHistory.filter(
-        (request) =>
-            request.status >= 200 &&
-            request.status < 300
-    ).length;
-
+    // Overview statistics
     const averageLatency =
         requestHistory.length > 0
             ? Math.round(
-                requestHistory.reduce(
-                    (total, request) =>
-                        total + (request.responseTime || 0),
-                    0
-                ) / requestHistory.length
-            )
+                  requestHistory.reduce(
+                      (total, request) =>
+                          total + (request.responseTime || 0),
+                      0
+                  ) / requestHistory.length
+              )
             : 0;
 
     // Reset visible APIs whenever API source changes
     useEffect(() => {
-        setVisibleApis(3);
+        setVisibleApis(5);
     }, [apiSource]);
 
     const handleSend = async () => {
         setLoading(true);
+
         const startTime = performance.now();
 
         if (!endpoint.trim()) {
@@ -98,6 +96,7 @@ function MainContent({
             return;
         }
 
+        // Validate JSON for methods that require a body
         if (["POST", "PUT", "PATCH"].includes(method)) {
             try {
                 JSON.parse(body);
@@ -225,7 +224,7 @@ function MainContent({
     };
 
     return (
-        <main className="flex-1 p-6">
+        <main className="min-w-0 flex-1 p-4 sm:p-6">
             <h1 className="text-2xl font-semibold capitalize">
                 {activePage.replace("-", " ")}
             </h1>
@@ -234,9 +233,12 @@ function MainContent({
                 Backend API Control Center
             </p>
 
-            {/* Overview */}
+            {/* ========================= */}
+            {/* OVERVIEW */}
+            {/* ========================= */}
+
             {activePage === "overview" && (
-                <div className="mt-8 grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+                <div className="mt-6 grid grid-cols-1 gap-4 sm:mt-8 md:grid-cols-2 lg:grid-cols-3">
 
                     {/* API Status */}
                     <Card>
@@ -251,20 +253,21 @@ function MainContent({
                         <CardContent>
                             <div className="flex items-center gap-2">
                                 <span
-                                    className={`h-2 w-2 rounded-full ${apiStatus === "online"
+                                    className={`h-2 w-2 rounded-full ${
+                                        apiStatus === "online"
                                             ? "bg-green-500"
                                             : apiStatus === "offline"
-                                                ? "bg-red-500"
-                                                : "bg-yellow-500"
-                                        }`}
+                                            ? "bg-red-500"
+                                            : "bg-yellow-500"
+                                    }`}
                                 ></span>
 
                                 <span className="font-medium">
                                     {apiStatus === "online"
                                         ? "Online"
                                         : apiStatus === "offline"
-                                            ? "Offline"
-                                            : "Checking..."}
+                                        ? "Offline"
+                                        : "Checking..."}
                                 </span>
                             </div>
 
@@ -272,12 +275,11 @@ function MainContent({
                                 {apiStatus === "online"
                                     ? "Go API is operational"
                                     : apiStatus === "offline"
-                                        ? "Go API is unreachable"
-                                        : "Checking Go API server..."}
+                                    ? "Go API is unreachable"
+                                    : "Checking Go API server..."}
                             </p>
                         </CardContent>
                     </Card>
-
 
                     {/* Total Requests */}
                     <Card>
@@ -300,7 +302,6 @@ function MainContent({
                         </CardContent>
                     </Card>
 
-
                     {/* Average Latency */}
                     <Card>
                         <CardHeader>
@@ -321,13 +322,15 @@ function MainContent({
                             </p>
                         </CardContent>
                     </Card>
-
                 </div>
             )}
 
-            {/* API Explorer */}
+            {/* ========================= */}
+            {/* API EXPLORER */}
+            {/* ========================= */}
+
             {activePage === "explorer" && (
-                <div className="mt-8 max-w-4xl">
+                <div className="mt-6 w-full max-w-4xl sm:mt-8">
 
                     {/* API Source */}
                     <div className="mb-6">
@@ -340,7 +343,7 @@ function MainContent({
                             onChange={(e) =>
                                 setApiSource(e.target.value)
                             }
-                            className="mt-2 rounded-md border px-3 py-2 text-sm"
+                            className="mt-2 w-full cursor-pointer rounded-md border px-3 py-2 text-sm sm:w-auto"
                         >
                             <option value="my">
                                 My APIs
@@ -352,10 +355,12 @@ function MainContent({
                         </select>
                     </div>
 
-                    {/* My APIs */}
+                    {/* ========================= */}
+                    {/* MY APIS */}
+                    {/* ========================= */}
+
                     {apiSource === "my" && (
                         <div className="mb-6">
-
                             <div className="mb-3">
                                 <p className="text-sm font-medium">
                                     My Go APIs
@@ -367,7 +372,6 @@ function MainContent({
                             </div>
 
                             <div className="space-y-3">
-
                                 {myApis
                                     .slice(0, visibleApis)
                                     .map((api) => (
@@ -377,10 +381,15 @@ function MainContent({
                                         >
                                             <CardContent className="p-4">
                                                 <button
-                                                    className="w-full text-left"
+                                                    className="w-full cursor-pointer text-left"
                                                     onClick={() => {
-                                                        setMethod(api.method);
-                                                        setEndpoint(api.endpoint);
+                                                        setMethod(
+                                                            api.method
+                                                        );
+
+                                                        setEndpoint(
+                                                            api.endpoint
+                                                        );
 
                                                         setResponse(null);
 
@@ -399,35 +408,47 @@ function MainContent({
                                                         setHeaders(
                                                             Object.entries(
                                                                 api.headers || {}
-                                                            ).map(([key, value]) => ({
-                                                                key,
-                                                                value,
-                                                            }))
+                                                            ).map(
+                                                                ([
+                                                                    key,
+                                                                    value,
+                                                                ]) => ({
+                                                                    key,
+                                                                    value,
+                                                                })
+                                                            )
                                                         );
                                                     }}
                                                 >
-                                                    <div className="flex items-center justify-between gap-4">
-                                                        <div className="flex items-center gap-3">
+                                                    <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                                                        <div className="flex min-w-0 items-center gap-3">
                                                             <Badge
                                                                 className={
-                                                                    api.method === "GET"
-                                                                        ? "bg-green-500 text-white hover:bg-green-500"
-                                                                        : api.method === "POST"
-                                                                            ? "bg-blue-500 text-white hover:bg-blue-500"
-                                                                            : api.method === "PUT"
-                                                                                ? "bg-orange-500 text-white hover:bg-orange-500"
-                                                                                : api.method === "PATCH"
-                                                                                    ? "bg-purple-500 text-white hover:bg-purple-500"
-                                                                                    : api.method === "DELETE"
-                                                                                        ? "bg-red-500 text-white hover:bg-red-500"
-                                                                                        : ""
+                                                                    api.method ===
+                                                                    "GET"
+                                                                        ? "shrink-0 bg-green-500 text-white hover:bg-green-500"
+                                                                        : api.method ===
+                                                                          "POST"
+                                                                        ? "shrink-0 bg-blue-500 text-white hover:bg-blue-500"
+                                                                        : api.method ===
+                                                                          "PUT"
+                                                                        ? "shrink-0 bg-orange-500 text-white hover:bg-orange-500"
+                                                                        : api.method ===
+                                                                          "PATCH"
+                                                                        ? "shrink-0 bg-purple-500 text-white hover:bg-purple-500"
+                                                                        : api.method ===
+                                                                          "DELETE"
+                                                                        ? "shrink-0 bg-red-500 text-white hover:bg-red-500"
+                                                                        : "shrink-0"
                                                                 }
                                                             >
                                                                 {api.method}
                                                             </Badge>
 
-                                                            <span className="font-mono text-sm font-medium">
-                                                                {api.endpoint}
+                                                            <span className="min-w-0 break-all font-mono text-sm font-medium">
+                                                                {
+                                                                    api.endpoint
+                                                                }
                                                             </span>
                                                         </div>
 
@@ -435,27 +456,46 @@ function MainContent({
                                                             type="button"
                                                             variant="outline"
                                                             size="sm"
-                                                            className={`cursor-pointer ${copiedApi === api.id
-                                                                ? "border-green-500 bg-green-500 text-white hover:bg-green-500 hover:text-white"
-                                                                : ""
-                                                                }`}
-                                                            onClick={async (e) => {
+                                                            className={`w-full cursor-pointer sm:w-auto ${
+                                                                copiedApi ===
+                                                                api.id
+                                                                    ? "border-green-500 bg-green-500 text-white hover:bg-green-500 hover:text-white"
+                                                                    : ""
+                                                            }`}
+                                                            onClick={async (
+                                                                e
+                                                            ) => {
                                                                 e.stopPropagation();
 
                                                                 try {
-                                                                    await navigator.clipboard.writeText(api.endpoint);
+                                                                    await navigator.clipboard.writeText(
+                                                                        api.endpoint
+                                                                    );
 
-                                                                    setCopiedApi(api.id);
+                                                                    setCopiedApi(
+                                                                        api.id
+                                                                    );
 
-                                                                    setTimeout(() => {
-                                                                        setCopiedApi(null);
-                                                                    }, 2000);
+                                                                    setTimeout(
+                                                                        () => {
+                                                                            setCopiedApi(
+                                                                                null
+                                                                            );
+                                                                        },
+                                                                        2000
+                                                                    );
                                                                 } catch (error) {
-                                                                    console.error("Failed to copy endpoint:", error);
+                                                                    console.error(
+                                                                        "Failed to copy endpoint:",
+                                                                        error
+                                                                    );
                                                                 }
                                                             }}
                                                         >
-                                                            {copiedApi === api.id ? "Copied!" : "Copy"}
+                                                            {copiedApi ===
+                                                            api.id
+                                                                ? "Copied!"
+                                                                : "Copy"}
                                                         </Button>
                                                     </div>
 
@@ -475,40 +515,38 @@ function MainContent({
                             {/* Load More */}
                             {visibleApis < myApis.length && (
                                 <div className="mt-4 flex justify-center">
-
                                     <Button
                                         variant="outline"
+                                        className="w-full cursor-pointer sm:w-auto"
                                         onClick={() =>
                                             setVisibleApis(
-                                                (prev) =>
-                                                    prev + 3
+                                                (prev) => prev + 3
                                             )
                                         }
                                     >
                                         Load More
                                     </Button>
-
                                 </div>
                             )}
                         </div>
                     )}
 
-                    {/* Request */}
+                    {/* ========================= */}
+                    {/* REQUEST */}
+                    {/* ========================= */}
+
                     <div>
                         <p className="mb-2 text-sm font-medium">
                             Request
                         </p>
 
-                        <div className="flex gap-2">
-
+                        <div className="flex flex-col gap-2 sm:flex-row">
                             <select
                                 value={method}
                                 onChange={(e) =>
-                                    setMethod(
-                                        e.target.value
-                                    )
+                                    setMethod(e.target.value)
                                 }
-                                className="rounded-md border px-3 py-2 text-sm"
+                                className="w-full cursor-pointer rounded-md border px-3 py-2 text-sm sm:w-auto"
                             >
                                 <option>GET</option>
                                 <option>POST</option>
@@ -522,29 +560,28 @@ function MainContent({
                                 placeholder="https://api.example.com/users"
                                 value={endpoint}
                                 onChange={(e) =>
-                                    setEndpoint(
-                                        e.target.value
-                                    )
+                                    setEndpoint(e.target.value)
                                 }
-                                className="flex-1 rounded-md border px-3 py-2 text-sm"
+                                className="min-w-0 flex-1 rounded-md border px-3 py-2 text-sm"
                             />
 
                             <Button
                                 onClick={handleSend}
                                 disabled={loading}
+                                className="w-full cursor-pointer sm:w-auto"
                             >
                                 {loading
                                     ? "Sending..."
                                     : "Send"}
                             </Button>
-
                         </div>
 
-                        {/* Headers */}
+                        {/* ========================= */}
+                        {/* HEADERS */}
+                        {/* ========================= */}
+
                         <div className="mt-4">
-
-                            <div className="flex items-center justify-between">
-
+                            <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                                 <label className="text-sm font-medium">
                                     Headers
                                 </label>
@@ -552,28 +589,24 @@ function MainContent({
                                 <Button
                                     variant="outline"
                                     size="sm"
+                                    className="w-full cursor-pointer sm:w-auto"
                                     onClick={addHeader}
                                 >
                                     + Add Header
                                 </Button>
-
                             </div>
 
                             <div className="mt-2 space-y-2">
-
                                 {headers.map(
                                     (header, index) => (
                                         <div
                                             key={index}
-                                            className="flex gap-2"
+                                            className="flex flex-col gap-2 sm:flex-row"
                                         >
-
                                             <input
                                                 type="text"
                                                 placeholder="Header name"
-                                                value={
-                                                    header.key
-                                                }
+                                                value={header.key}
                                                 onChange={(e) =>
                                                     updateHeader(
                                                         index,
@@ -582,15 +615,13 @@ function MainContent({
                                                             .value
                                                     )
                                                 }
-                                                className="flex-1 rounded-md border px-3 py-2 text-sm"
+                                                className="min-w-0 flex-1 rounded-md border px-3 py-2 text-sm"
                                             />
 
                                             <input
                                                 type="text"
                                                 placeholder="Header value"
-                                                value={
-                                                    header.value
-                                                }
+                                                value={header.value}
                                                 onChange={(e) =>
                                                     updateHeader(
                                                         index,
@@ -599,12 +630,13 @@ function MainContent({
                                                             .value
                                                     )
                                                 }
-                                                className="flex-1 rounded-md border px-3 py-2 text-sm"
+                                                className="min-w-0 flex-1 rounded-md border px-3 py-2 text-sm"
                                             />
 
                                             <Button
                                                 variant="outline"
                                                 size="sm"
+                                                className="w-full cursor-pointer sm:w-auto"
                                                 onClick={() =>
                                                     removeHeader(
                                                         index
@@ -613,46 +645,43 @@ function MainContent({
                                             >
                                                 Remove
                                             </Button>
-
                                         </div>
                                     )
                                 )}
-
                             </div>
                         </div>
 
-                        {/* Request Body */}
+                        {/* ========================= */}
+                        {/* REQUEST BODY */}
+                        {/* ========================= */}
+
                         {["POST", "PUT", "PATCH"].includes(
                             method
                         ) && (
-                                <div className="mt-4">
+                            <div className="mt-4">
+                                <label className="text-sm font-medium">
+                                    Request Body
+                                </label>
 
-                                    <label className="text-sm font-medium">
-                                        Request Body
-                                    </label>
+                                <textarea
+                                    value={body}
+                                    onChange={(e) =>
+                                        setBody(e.target.value)
+                                    }
+                                    placeholder='{"name":"Sagar"}'
+                                    className="mt-2 min-h-32 w-full rounded-md border p-3 font-mono text-sm"
+                                />
+                            </div>
+                        )}
 
-                                    <textarea
-                                        value={body}
-                                        onChange={(e) =>
-                                            setBody(
-                                                e.target.value
-                                            )
-                                        }
-                                        placeholder='{"name":"Sagar"}'
-                                        className="mt-2 min-h-32 w-full rounded-md border p-3 font-mono text-sm"
-                                    />
+                        {/* ========================= */}
+                        {/* RESPONSE */}
+                        {/* ========================= */}
 
-                                </div>
-                            )}
-
-                        {/* Response */}
                         {response && (
                             <Card className="mt-6">
-
                                 <CardHeader>
-
-                                    <div className="flex items-center justify-between">
-
+                                    <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                                         <div>
                                             <CardTitle>
                                                 Response
@@ -663,16 +692,16 @@ function MainContent({
                                             </CardDescription>
                                         </div>
 
-                                        <div className="flex items-center gap-3">
-
+                                        <div className="flex flex-wrap items-center gap-3">
                                             <span
-                                                className={`rounded-md px-3 py-1 text-sm font-medium ${response.status >=
-                                                    200 &&
+                                                className={`rounded-md px-3 py-1 text-sm font-medium ${
+                                                    response.status >=
+                                                        200 &&
                                                     response.status <
-                                                    300
-                                                    ? "bg-green-100 text-green-700"
-                                                    : "bg-red-100 text-red-700"
-                                                    }`}
+                                                        300
+                                                        ? "bg-green-100 text-green-700"
+                                                        : "bg-red-100 text-red-700"
+                                                }`}
                                             >
                                                 {response.status}{" "}
                                                 {
@@ -682,46 +711,42 @@ function MainContent({
 
                                             {response.responseTime !==
                                                 undefined && (
-                                                    <span className="text-sm text-muted-foreground">
-                                                        {
-                                                            response.responseTime
-                                                        }{" "}
-                                                        ms
-                                                    </span>
-                                                )}
-
+                                                <span className="text-sm text-muted-foreground">
+                                                    {
+                                                        response.responseTime
+                                                    }{" "}
+                                                    ms
+                                                </span>
+                                            )}
                                         </div>
-
                                     </div>
-
                                 </CardHeader>
 
                                 <CardContent>
-
-                                    <pre className="max-h-96 overflow-auto rounded-md border p-4 text-sm">
-                                        {JSON.stringify(
-                                            response.body,
-                                            null,
-                                            2
-                                        )}
+                                    <pre className="max-h-96 overflow-auto rounded-md border p-3 text-xs sm:p-4 sm:text-sm">
+                                        {typeof response.body ===
+                                        "string"
+                                            ? response.body
+                                            : JSON.stringify(
+                                                  response.body,
+                                                  null,
+                                                  2
+                                              )}
                                     </pre>
-
                                 </CardContent>
-
                             </Card>
                         )}
-
                     </div>
-
                 </div>
             )}
 
-            {/* Request History */}
+            {/* ========================= */}
+            {/* REQUEST HISTORY */}
+            {/* ========================= */}
+
             {activePage === "history" && (
-                <div className="mt-8">
-
-                    <div className="mb-4 flex items-center justify-between">
-
+                <div className="mt-6 sm:mt-8">
+                    <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                         <div>
                             <h2 className="text-lg font-semibold">
                                 Request History
@@ -734,17 +759,16 @@ function MainContent({
 
                         <Button
                             variant="outline"
+                            className="w-full cursor-pointer sm:w-auto"
                             onClick={() =>
                                 setRequestHistory([])
                             }
                         >
                             Clear History
                         </Button>
-
                     </div>
 
                     <div className="space-y-3">
-
                         {requestHistory.length === 0 ? (
                             <p className="text-muted-foreground">
                                 No requests yet.
@@ -753,32 +777,27 @@ function MainContent({
                             requestHistory.map(
                                 (request, index) => (
                                     <Card key={index}>
-
-                                        <CardContent className="flex items-center justify-between p-4">
-
+                                        <CardContent className="flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:justify-between">
                                             {/* Method + Endpoint */}
-                                            <div className="flex items-center gap-3">
-
+                                            <div className="flex min-w-0 flex-wrap items-center gap-3">
                                                 <span className="font-mono text-sm font-semibold">
                                                     {request.method}
                                                 </span>
 
-                                                <span className="text-sm">
+                                                <span className="break-all text-sm">
                                                     {
                                                         request.endpoint
                                                     }
                                                 </span>
-
                                             </div>
 
                                             {/* Status + Response Time + Timestamp */}
-                                            <div className="flex items-center gap-3">
-
+                                            <div className="flex flex-wrap items-center gap-3">
                                                 <Badge
                                                     className={
                                                         request.status >=
                                                             200 &&
-                                                            request.status <
+                                                        request.status <
                                                             300
                                                             ? "bg-green-500 text-white hover:bg-green-500"
                                                             : ""
@@ -786,45 +805,39 @@ function MainContent({
                                                     variant={
                                                         request.status >=
                                                             200 &&
-                                                            request.status <
+                                                        request.status <
                                                             300
                                                             ? "default"
                                                             : "destructive"
                                                     }
                                                 >
                                                     {request.status ===
-                                                        0
+                                                    0
                                                         ? "Network Error"
                                                         : `${request.status} ${request.statusText}`}
                                                 </Badge>
 
-                                                {/* Response Time */}
                                                 {request.responseTime !==
                                                     undefined && (
-                                                        <span className="text-xs font-medium text-muted-foreground">
-                                                            {
-                                                                request.responseTime
-                                                            }{" "}
-                                                            ms
-                                                        </span>
-                                                    )}
+                                                    <span className="text-xs font-medium text-muted-foreground">
+                                                        {
+                                                            request.responseTime
+                                                        }{" "}
+                                                        ms
+                                                    </span>
+                                                )}
 
-                                                {/* Timestamp */}
                                                 <span className="text-xs text-muted-foreground">
                                                     {
                                                         request.timestamp
                                                     }
                                                 </span>
-
                                             </div>
-
                                         </CardContent>
-
                                     </Card>
                                 )
                             )
                         )}
-
                     </div>
                 </div>
             )}

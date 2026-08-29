@@ -8,28 +8,28 @@ function Sidebar({ activePage, setActivePage }) {
     ];
 
     return (
-        <aside className="w-60 border-r p-4">
+        <aside className="hidden w-60 shrink-0 border-r p-4 md:block">
             <p className="mb-3 text-xs text-muted-foreground">
                 PLAYGROUND
             </p>
 
             <div className="space-y-1">
-                {navigation.map((item) => {
-                    return (
-                        <Button
-                            key={item.value}
-                            onClick={() => setActivePage(item.value)}
-                            variant={
-                                activePage === item.value
-                                    ? "secondary"
-                                    : "ghost"
-                            }
-                            className="w-full justify-start"
-                        >
-                            {item.label}
-                        </Button>
-                    );
-                })}
+                {navigation.map((item) => (
+                    <Button
+                        key={item.value}
+                        onClick={() =>
+                            setActivePage(item.value)
+                        }
+                        variant={
+                            activePage === item.value
+                                ? "secondary"
+                                : "ghost"
+                        }
+                        className="w-full cursor-pointer justify-start"
+                    >
+                        {item.label}
+                    </Button>
+                ))}
             </div>
         </aside>
     );

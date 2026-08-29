@@ -23,7 +23,10 @@ function App() {
 
     return (
         <>
-            <Navbar />
+            <Navbar
+                activePage={activePage}
+                setActivePage={setActivePage}
+            />
 
             <div className="flex min-h-screen">
                 <Sidebar
