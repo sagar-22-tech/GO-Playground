@@ -367,7 +367,7 @@ function MainContent({
                                 </p>
 
                                 <p className="text-sm text-muted-foreground">
-                                    APIs provided by your Go backend
+                                    APIs provided by my Go backend
                                 </p>
                             </div>
 
