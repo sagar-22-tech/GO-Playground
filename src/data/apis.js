@@ -29,7 +29,7 @@ export const myApis = [
     },
     {
         id: "user{}",
-        name: "User API{}",
+        name: "User API ID",
         description:
             "Returns mock data of user detail using it's ID number",
         method: "GET",
