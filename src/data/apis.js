@@ -33,7 +33,7 @@ export const myApis = [
         description:
             "Returns mock data of user detail using it's ID number",
         method: "GET",
-        endpoint: "https://golang-apis-dox2.onrender.com/users/{id}",
+        endpoint: "https://golang-apis-dox2.onrender.com/users/:id",
         body: {
             
         },
