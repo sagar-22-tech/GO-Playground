@@ -75,7 +75,7 @@ function MainContent({
 
     // Reset visible APIs whenever API source changes
     useEffect(() => {
-        setVisibleApis(5);
+        setVisibleApis(3);
     }, [apiSource]);
 
     const handleSend = async () => {
