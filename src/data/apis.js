@@ -31,7 +31,7 @@ export const myApis = [
         id: "user{}",
         name: "User API ID",
         description:
-            "Returns mock data of user detail using it's ID number",
+            "Search users by their ID",
         method: "GET",
         endpoint: "https://golang-apis-dox2.onrender.com/users/:id",
         body: {
@@ -41,6 +41,18 @@ export const myApis = [
             "Content-Type": "application/json",
         },
     },
+    {
+    id: "user-search",
+    name: "Search Users",
+    description: "Search users by their first name",
+    method: "GET",
+    endpoint: "https://golang-apis-dox2.onrender.com/users?search=:search",
+    body: {},
+    headers: {
+        "Content-Type": "application/json",
+    },
+},
+    
 
     
 ];
